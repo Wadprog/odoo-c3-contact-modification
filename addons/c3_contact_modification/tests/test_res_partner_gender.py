@@ -1,5 +1,6 @@
 """Tests for the contact gender field."""
 
+from odoo.exceptions import ValidationError
 from odoo.tests import TransactionCase, tagged
 
 
@@ -26,3 +27,54 @@ class TestResPartnerGender(TransactionCase):
         )
 
         self.assertEqual(partner.gender, "male")
+
+    def test_individual_contact_requires_gender_on_create(self):
+        with self.assertRaisesRegex(
+            ValidationError,
+            "Gender is required for individual contacts.",
+        ):
+            self.env["res.partner"].create(
+                {
+                    "name": "Doe Jane",
+                    "is_company": False,
+                    "type": "contact",
+                }
+            )
+
+    def test_individual_contact_requires_gender_on_write(self):
+        partner = self.env["res.partner"].create(
+            {
+                "name": "Doe Jane",
+                "is_company": False,
+                "type": "contact",
+                "gender": "female",
+            }
+        )
+
+        with self.assertRaisesRegex(
+            ValidationError,
+            "Gender is required for individual contacts.",
+        ):
+            partner.write({"gender": False})
+
+    def test_company_contact_does_not_require_gender(self):
+        partner = self.env["res.partner"].create(
+            {
+                "name": "C3 Test Company",
+                "is_company": True,
+                "type": "contact",
+            }
+        )
+
+        self.assertFalse(partner.gender)
+
+    def test_non_contact_address_does_not_require_gender(self):
+        partner = self.env["res.partner"].create(
+            {
+                "name": "C3 Test Invoice Address",
+                "is_company": False,
+                "type": "invoice",
+            }
+        )
+
+        self.assertFalse(partner.gender)

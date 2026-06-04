@@ -57,6 +57,7 @@ class TestContactTags(TransactionCase):
             {
                 "name": "Doe John",
                 "is_company": False,
+                "gender": "male",
                 "category_id": [Command.link(tag.id)],
             }
         )

@@ -30,3 +30,8 @@ msgstr "Femme"
 #: model:ir.model.fields.selection,name:c3_contact_modification.selection__res_partner__gender__male
 msgid "Male"
 msgstr "Homme"
+
+#. module: c3_contact_modification
+#: code:addons/c3_contact_modification/models/res_partner.py:0
+msgid "Gender is required for individual contacts."
+msgstr "Le sexe est obligatoire pour les contacts individuels."
