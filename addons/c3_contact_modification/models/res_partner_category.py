@@ -1,6 +1,7 @@
 """Contact tag setup for C3 contact modification."""
 
-from odoo import api, models
+from odoo import _, api, models
+from odoo.exceptions import UserError
 
 
 MODULE = "c3_contact_modification"
@@ -23,6 +24,14 @@ C3_CONTACT_TAGS = [
 
 class ResPartnerCategory(models.Model):
     _inherit = "res.partner.category"
+
+    def write(self, vals):
+        self._check_c3_protected_tag_write(vals)
+        return super().write(vals)
+
+    def unlink(self):
+        self._check_c3_protected_tags()
+        return super().unlink()
 
     @api.model
     def _ensure_c3_contact_tags(self):
@@ -53,3 +62,19 @@ class ResPartnerCategory(models.Model):
                 model_data.create(values)
 
         return True
+
+    def _check_c3_protected_tag_write(self, vals):
+        if "name" in vals or vals.get("active") is False:
+            self._check_c3_protected_tags()
+
+    def _check_c3_protected_tags(self):
+        if self & self._get_c3_protected_tags():
+            raise UserError(_("This contact tag is protected by the contact setup module."))
+
+    def _get_c3_protected_tags(self):
+        tags = self.browse()
+        for xmlid_name, _tag_name in C3_CONTACT_TAGS:
+            tag = self.env.ref(f"{MODULE}.{xmlid_name}", raise_if_not_found=False)
+            if tag:
+                tags |= tag
+        return tags

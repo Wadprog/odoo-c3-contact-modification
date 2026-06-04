@@ -40,3 +40,8 @@ msgstr "Le sexe est obligatoire pour les contacts individuels."
 #: model_terms:ir.ui.view,arch_db:c3_contact_modification.view_partner_form_inherit_gender
 msgid "Last name first, then first name"
 msgstr "Nom d'abord, puis prénom"
+
+#. module: c3_contact_modification
+#: code:addons/c3_contact_modification/models/res_partner_category.py:0
+msgid "This contact tag is protected by the contact setup module."
+msgstr "Cette étiquette de contact est protégée par le module de configuration des contacts."
