@@ -6,7 +6,9 @@
     "author": "Wadprog",
     "license": "LGPL-3",
     "depends": ["contacts"],
-    "data": [],
+    "data": [
+        "data/contact_tags.xml",
+    ],
     "installable": True,
     "application": False,
     "auto_install": False,
