@@ -77,3 +77,21 @@ msgstr "Les images de pièce d'identité doivent faire 5 Mo ou moins."
 #: code:addons/c3_contact_modification/static/src/fields/c3_id_document_binary_field.xml:0
 msgid "Preview"
 msgstr "Aperçu"
+
+#. module: c3_contact_modification
+#: code:addons/c3_contact_modification/models/res_partner.py:0
+#, python-format
+msgid "%(user)s uploaded an ID document."
+msgstr "%(user)s a téléversé une pièce d'identité."
+
+#. module: c3_contact_modification
+#: code:addons/c3_contact_modification/models/res_partner.py:0
+#, python-format
+msgid "%(user)s replaced the ID document."
+msgstr "%(user)s a remplacé la pièce d'identité."
+
+#. module: c3_contact_modification
+#: code:addons/c3_contact_modification/models/res_partner.py:0
+#, python-format
+msgid "%(user)s deleted the ID document."
+msgstr "%(user)s a supprimé la pièce d'identité."
