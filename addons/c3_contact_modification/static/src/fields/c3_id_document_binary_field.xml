@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<templates xml:space="preserve">
+
+    <t
+        t-name="c3_contact_modification.IdDocumentBinaryField"
+        t-inherit="web.BinaryField"
+        t-inherit-mode="primary"
+    >
+        <xpath expr="//button[hasclass('o_download_file_button')]" position="after">
+            <button
+                class="btn btn-link btn-sm lh-1 fa fa-eye o_c3_preview_id_document_button"
+                data-tooltip="Preview"
+                aria-label="Preview"
+                t-on-click="onFilePreview"
+            >
+            </button>
+        </xpath>
+        <xpath expr="//a[hasclass('o_form_uri')]" position="before">
+            <button
+                class="btn btn-link btn-sm lh-1 fa fa-eye o_c3_preview_id_document_button"
+                data-tooltip="Preview"
+                aria-label="Preview"
+                t-on-click="onFilePreview"
+            >
+            </button>
+        </xpath>
+    </t>
+
+</templates>
