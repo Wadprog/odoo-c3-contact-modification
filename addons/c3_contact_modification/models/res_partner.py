@@ -33,6 +33,15 @@ class ResPartner(models.Model):
         copy=False,
     )
 
+    @api.model_create_multi
+    def create(self, vals_list):
+        self._c3_normalize_company_type(vals_list)
+        return super().create(vals_list)
+
+    def write(self, vals):
+        self._c3_normalize_company_type([vals])
+        return super().write(vals)
+
     @api.constrains("gender", "is_company", "type")
     def _check_gender_required_for_individual_contacts(self):
         for partner in self:
@@ -74,3 +83,9 @@ class ResPartner(models.Model):
             return base64.b64decode(encoded_document, validate=True)
         except (binascii.Error, TypeError):
             raise ValidationError(_("Only JPG and PNG identity document images are allowed."))
+
+    @api.model
+    def _c3_normalize_company_type(self, vals_list):
+        for vals in vals_list:
+            if "company_type" in vals:
+                vals["is_company"] = vals["company_type"] == "company"

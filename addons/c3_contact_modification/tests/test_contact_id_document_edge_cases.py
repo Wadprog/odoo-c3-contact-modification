@@ -1,7 +1,8 @@
 """Tests for contact ID document lifecycle edge cases."""
 
 from odoo.exceptions import ValidationError
-from odoo.tests import TransactionCase, tagged
+from odoo.tests import Form, TransactionCase, tagged
+from odoo.tools.safe_eval import safe_eval
 
 from .test_contact_id_document_storage import VALID_PNG_DATA
 
@@ -90,3 +91,18 @@ class TestContactIdDocumentEdgeCases(TransactionCase):
             "ID documents are only available for individual contacts.",
         ):
             company.c3_id_document = VALID_PNG_DATA
+
+    def test_contacts_app_individual_form_can_save_id_document(self):
+        contacts_action = self.env.ref("contacts.action_contacts")
+        partner_model = self.env["res.partner"].with_context(
+            **safe_eval(contacts_action.context)
+        )
+
+        with Form(partner_model, "base.view_partner_form") as partner_form:
+            partner_form.company_type = "person"
+            partner_form.name = "Doe Alice"
+            partner_form.gender = "female"
+            partner_form.c3_id_document = VALID_PNG_DATA
+
+        self.assertFalse(partner_form.record.is_company)
+        self.assertTrue(partner_form.record.c3_id_document)
