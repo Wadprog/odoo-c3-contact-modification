@@ -11,12 +11,12 @@ VALID_PNG_DATA = (
 
 @tagged("post_install", "-at_install")
 class TestContactIdDocumentStorage(TransactionCase):
-    def _create_attachment(self, partner, name="id-document.png"):
+    def _create_attachment(self, partner, name="id-document.png", mimetype="image/png", datas=None):
         return self.env["ir.attachment"].create(
             {
                 "name": name,
-                "datas": VALID_PNG_DATA,
-                "mimetype": "image/png",
+                "datas": datas or VALID_PNG_DATA,
+                "mimetype": mimetype,
                 "res_model": "res.partner",
                 "res_id": partner.id,
             }
