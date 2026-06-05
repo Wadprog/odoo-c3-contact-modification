@@ -1,6 +1,7 @@
 """Tests for required contact tag setup."""
 
 from odoo import Command
+from odoo.exceptions import UserError
 from odoo.tests import TransactionCase, tagged
 
 from odoo.addons.c3_contact_modification.models.res_partner_category import (
@@ -71,3 +72,40 @@ class TestContactTags(TransactionCase):
 
         self.assertIn(tag, person.category_id)
         self.assertIn(tag, company.category_id)
+
+    def test_required_contact_tags_cannot_be_deleted(self):
+        tag = self.env.ref(f"{MODULE}.{C3_CONTACT_TAGS[0][0]}")
+
+        with self.assertRaisesRegex(
+            UserError,
+            "This contact tag is protected by the contact setup module.",
+        ):
+            tag.sudo().unlink()
+
+    def test_required_contact_tags_cannot_be_renamed(self):
+        tag = self.env.ref(f"{MODULE}.{C3_CONTACT_TAGS[0][0]}")
+
+        with self.assertRaisesRegex(
+            UserError,
+            "This contact tag is protected by the contact setup module.",
+        ):
+            tag.sudo().write({"name": "Changed"})
+
+    def test_required_contact_tags_cannot_be_archived(self):
+        tag = self.env.ref(f"{MODULE}.{C3_CONTACT_TAGS[0][0]}")
+
+        with self.assertRaisesRegex(
+            UserError,
+            "This contact tag is protected by the contact setup module.",
+        ):
+            tag.sudo().write({"active": False})
+
+    def test_non_protected_contact_tags_keep_normal_behavior(self):
+        tag = self.env["res.partner.category"].create({"name": "Temporary"})
+
+        tag.write({"name": "Temporary Updated", "active": False})
+        self.assertEqual(tag.name, "Temporary Updated")
+        self.assertFalse(tag.active)
+
+        tag.unlink()
+        self.assertFalse(tag.exists())
