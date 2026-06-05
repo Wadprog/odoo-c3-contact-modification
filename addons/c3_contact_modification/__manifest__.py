@@ -1,7 +1,7 @@
 {
     "name": "C3 Contact Modification",
     "summary": "Extends Odoo Contacts with C3 contact setup customizations.",
-    "version": "19.0.1.8.0",
+    "version": "19.0.1.9.0",
     "category": "Contacts",
     "author": "Wadprog",
     "license": "LGPL-3",
