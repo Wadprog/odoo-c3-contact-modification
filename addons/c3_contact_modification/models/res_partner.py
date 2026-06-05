@@ -37,12 +37,29 @@ class ResPartner(models.Model):
             if partner._is_c3_individual_contact_without_gender():
                 raise ValidationError(_("Gender is required for individual contacts."))
 
+    @api.constrains("c3_id_document_attachment_id", "is_company")
+    def _check_c3_id_document_individual_only(self):
+        for partner in self:
+            if partner.is_company and partner.c3_id_document_attachment_id:
+                raise ValidationError(
+                    _(
+                        "ID documents are only available for individual contacts. "
+                        "Remove the ID document before changing this contact to a company."
+                    )
+                )
+
     @api.constrains("c3_id_document_attachment_id")
     def _check_c3_id_document_attachment(self):
         for partner in self:
             attachment = partner.c3_id_document_attachment_id
             if attachment:
                 partner._validate_c3_id_document_attachment(attachment)
+
+    def unlink(self):
+        id_documents = self.mapped("c3_id_document_attachment_id")
+        result = super().unlink()
+        id_documents.exists().unlink()
+        return result
 
     def _is_c3_individual_contact_without_gender(self):
         self.ensure_one()
