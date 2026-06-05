@@ -11,6 +11,18 @@
             <xpath expr="//field[@name='function']" position="after">
                 <field name="gender" invisible="is_company"/>
             </xpath>
+            <xpath expr="//page[@name='internal_notes']" position="after">
+                <page name="c3_id_document" string="ID Document" invisible="is_company">
+                    <group>
+                        <field
+                            name="c3_id_document"
+                            filename="c3_id_document_filename"
+                            options="{'accepted_file_extensions': '.jpg,.jpeg,.png', 'allowed_mime_type': 'image/jpeg,image/png'}"
+                        />
+                        <field name="c3_id_document_filename" invisible="1"/>
+                    </group>
+                </page>
+            </xpath>
         </field>
     </record>
 </odoo>

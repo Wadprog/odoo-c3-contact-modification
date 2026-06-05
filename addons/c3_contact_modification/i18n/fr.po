@@ -23,6 +23,7 @@ msgstr "Sexe"
 
 #. module: c3_contact_modification
 #: model:ir.model.fields,field_description:c3_contact_modification.field_res_partner__c3_id_document
+#: model_terms:ir.ui.view,arch_db:c3_contact_modification.view_partner_form_inherit_gender
 msgid "ID Document"
 msgstr "Pièce d'identité"
 
