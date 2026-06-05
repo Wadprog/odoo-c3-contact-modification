@@ -11,7 +11,7 @@
     This module is part of the C3 Edition project.
     Module page: https://wadprog.github.io/odoo-c3-contact-modification/
     """,
-    "version": "19.0.1.12.0",
+    "version": "19.0.1.13.0",
     "category": "Contacts",
     "author": "Wadprog",
     "license": "LGPL-3",

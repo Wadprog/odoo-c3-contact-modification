@@ -37,12 +37,20 @@ class ResPartner(models.Model):
     def create(self, vals_list):
         self._c3_normalize_company_type(vals_list)
         self._c3_normalize_id_document_deletion(vals_list)
-        return super().create(vals_list)
+        partners = super().create(vals_list)
+        partners._c3_log_id_document_uploads_from_create(vals_list)
+        return partners
 
     def write(self, vals):
         self._c3_normalize_company_type([vals])
         self._c3_normalize_id_document_deletion([vals])
-        return super().write(vals)
+        previous_documents = {}
+        if "c3_id_document" in vals:
+            previous_documents = {partner.id: partner.c3_id_document for partner in self}
+        result = super().write(vals)
+        if "c3_id_document" in vals:
+            self._c3_log_id_document_changes_from_write(vals, previous_documents)
+        return result
 
     @api.constrains("gender", "is_company", "type")
     def _check_gender_required_for_individual_contacts(self):
@@ -97,3 +105,41 @@ class ResPartner(models.Model):
         for vals in vals_list:
             if "c3_id_document" in vals and vals["c3_id_document"] is False:
                 vals["c3_id_document_filename"] = False
+
+    def _c3_log_id_document_uploads_from_create(self, vals_list):
+        for partner, vals in zip(self, vals_list):
+            if partner.is_company or not vals.get("c3_id_document"):
+                continue
+            partner._c3_post_id_document_log("upload")
+
+    def _c3_log_id_document_changes_from_write(self, vals, previous_documents):
+        new_document = vals.get("c3_id_document")
+        for partner in self:
+            if partner.is_company:
+                continue
+            previous_document = previous_documents.get(partner.id)
+            if new_document is False:
+                if previous_document:
+                    partner._c3_post_id_document_log("delete")
+            elif new_document:
+                if not previous_document:
+                    partner._c3_post_id_document_log("upload")
+                elif new_document != previous_document:
+                    partner._c3_post_id_document_log("replace")
+
+    def _c3_post_id_document_log(self, action):
+        self.ensure_one()
+        if not hasattr(self, "message_post"):
+            return
+
+        user_name = self.env.user.display_name
+        messages = {
+            "upload": _("%(user)s uploaded an ID document.", user=user_name),
+            "replace": _("%(user)s replaced the ID document.", user=user_name),
+            "delete": _("%(user)s deleted the ID document.", user=user_name),
+        }
+        self.message_post(
+            body=messages[action],
+            message_type="notification",
+            subtype_xmlid="mail.mt_note",
+        )
