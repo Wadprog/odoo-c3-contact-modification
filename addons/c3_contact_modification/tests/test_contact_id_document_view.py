@@ -24,13 +24,17 @@ class TestContactIdDocumentView(TransactionCase):
         self.assertEqual(id_document_page.get("invisible"), "is_company")
         self.assertIs(notes_page.getnext(), id_document_page)
 
-    def test_id_document_field_uses_standard_binary_upload_controls(self):
+    def test_id_document_field_uses_size_limited_binary_upload_controls(self):
         arch = self._get_partner_form_arch()
 
         id_document_field = arch.xpath(
             "//page[@name='c3_id_document']//field[@name='c3_id_document']"
         )[0]
 
+        self.assertEqual(
+            id_document_field.get("widget"),
+            "c3_id_document_binary",
+        )
         self.assertEqual(
             id_document_field.get("filename"),
             "c3_id_document_filename",
