@@ -43,7 +43,6 @@ The module must not introduce a standalone app, menu, or separate custom view fl
 18. As a developer, I want the addon to depend on the official Contacts functionality, so that model and view inheritance are loaded in the correct order.
 19. As a maintainer, I want the predefined tag list to be declared clearly, so that future changes are easy to review.
 20. As a maintainer, I want the module to avoid unrelated contact behavior changes, so that the customization remains low-risk.
-
 ## Required Contact Tags
 
 The addon must ensure these tags exist in Odoo contact categories and can be manually assigned to both individual contacts and companies:
