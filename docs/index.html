@@ -1,0 +1,556 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="C3 Contact Modification, an Odoo 19 addon for consistent contact data and secure ID document handling.">
+  <meta name="theme-color" content="#ffffff">
+  <title>C3 Contact Modification for Odoo 19</title>
+  <link rel="icon" type="image/png" href="./icon.png">
+  <link rel="apple-touch-icon" href="./icon.png">
+  <style>
+    :root {
+      color-scheme: light;
+      --ink: #172033;
+      --muted: #5e6879;
+      --line: #dfe4eb;
+      --soft: #f5f7fa;
+      --orange: #e96d00;
+      --blue: #0969b8;
+      --green: #177245;
+      --white: #ffffff;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    html {
+      scroll-behavior: smooth;
+    }
+
+    body {
+      margin: 0;
+      color: var(--ink);
+      background: var(--white);
+      font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      line-height: 1.55;
+    }
+
+    a {
+      color: var(--blue);
+      text-underline-offset: 3px;
+    }
+
+    a:hover {
+      color: var(--orange);
+    }
+
+    .shell {
+      width: min(1120px, calc(100% - 40px));
+      margin: 0 auto;
+    }
+
+    .topbar {
+      position: sticky;
+      top: 0;
+      z-index: 10;
+      background: rgba(255, 255, 255, 0.96);
+      border-bottom: 1px solid var(--line);
+    }
+
+    .nav {
+      min-height: 64px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 24px;
+    }
+
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      color: var(--ink);
+      font-weight: 750;
+      text-decoration: none;
+    }
+
+    .brand img {
+      width: 36px;
+      height: 36px;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      object-fit: cover;
+    }
+
+    .nav-links {
+      display: flex;
+      align-items: center;
+      gap: 20px;
+      font-size: 14px;
+    }
+
+    .nav-links a {
+      color: var(--muted);
+      font-weight: 650;
+      text-decoration: none;
+    }
+
+    .nav-links a:hover {
+      color: var(--ink);
+    }
+
+    .hero {
+      min-height: calc(100vh - 64px);
+      display: grid;
+      align-content: center;
+      padding: 72px 0 96px;
+      border-bottom: 1px solid var(--line);
+    }
+
+    .hero-content {
+      max-width: 820px;
+    }
+
+    .hero-icon {
+      width: 104px;
+      height: 104px;
+      margin-bottom: 28px;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      object-fit: cover;
+    }
+
+    .eyebrow {
+      margin: 0 0 14px;
+      color: var(--orange);
+      font-size: 13px;
+      font-weight: 800;
+      letter-spacing: 0;
+      text-transform: uppercase;
+    }
+
+    h1,
+    h2,
+    h3 {
+      margin-top: 0;
+      letter-spacing: 0;
+      line-height: 1.15;
+    }
+
+    h1 {
+      margin-bottom: 20px;
+      font-size: clamp(42px, 7vw, 76px);
+      font-weight: 800;
+    }
+
+    .hero-copy {
+      max-width: 700px;
+      margin: 0;
+      color: var(--muted);
+      font-size: 20px;
+    }
+
+    .actions {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 12px;
+      margin-top: 32px;
+    }
+
+    .button {
+      min-height: 44px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      padding: 10px 16px;
+      border: 1px solid var(--line);
+      border-radius: 6px;
+      color: var(--ink);
+      background: var(--white);
+      font-weight: 700;
+      text-decoration: none;
+    }
+
+    .button.primary {
+      border-color: var(--orange);
+      color: var(--white);
+      background: var(--orange);
+    }
+
+    .button:hover {
+      border-color: var(--ink);
+      color: var(--ink);
+      background: var(--soft);
+    }
+
+    .button.primary:hover {
+      border-color: #ba5700;
+      color: var(--white);
+      background: #ba5700;
+    }
+
+    .facts {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 12px 28px;
+      margin: 42px 0 0;
+      padding: 22px 0 0;
+      border-top: 1px solid var(--line);
+      list-style: none;
+    }
+
+    .facts li {
+      color: var(--muted);
+      font-size: 14px;
+    }
+
+    .facts strong {
+      color: var(--ink);
+    }
+
+    .band {
+      padding: 80px 0;
+      border-bottom: 1px solid var(--line);
+    }
+
+    .band.soft {
+      background: var(--soft);
+    }
+
+    .section-head {
+      max-width: 720px;
+      margin-bottom: 36px;
+    }
+
+    .section-head h2 {
+      margin-bottom: 12px;
+      font-size: 34px;
+    }
+
+    .section-head p {
+      margin: 0;
+      color: var(--muted);
+      font-size: 17px;
+    }
+
+    .feature-grid {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 16px;
+    }
+
+    .feature {
+      min-height: 210px;
+      padding: 22px;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: var(--white);
+    }
+
+    .feature-mark {
+      width: 34px;
+      height: 4px;
+      margin-bottom: 22px;
+      background: var(--orange);
+    }
+
+    .feature:nth-child(2n) .feature-mark {
+      background: var(--blue);
+    }
+
+    .feature:nth-child(3n) .feature-mark {
+      background: var(--green);
+    }
+
+    .feature h3 {
+      margin-bottom: 10px;
+      font-size: 18px;
+    }
+
+    .feature p,
+    .feature li {
+      color: var(--muted);
+      font-size: 14px;
+    }
+
+    .feature p,
+    .feature ul {
+      margin: 0;
+    }
+
+    .feature ul {
+      padding-left: 18px;
+    }
+
+    .workflow {
+      display: grid;
+      grid-template-columns: 210px minmax(0, 1fr);
+      gap: 28px;
+      padding: 22px 0;
+      border-top: 1px solid var(--line);
+    }
+
+    .workflow:last-child {
+      border-bottom: 1px solid var(--line);
+    }
+
+    .workflow h3,
+    .workflow p {
+      margin: 0;
+    }
+
+    .workflow p {
+      color: var(--muted);
+    }
+
+    .code-block {
+      overflow-x: auto;
+      padding: 18px;
+      border: 1px solid #293247;
+      border-radius: 6px;
+      color: #f4f7fb;
+      background: #172033;
+      font: 14px/1.6 ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+      white-space: pre;
+    }
+
+    .callout {
+      display: grid;
+      grid-template-columns: 1fr auto;
+      align-items: center;
+      gap: 28px;
+      padding: 28px;
+      border: 1px solid var(--line);
+      border-left: 5px solid var(--orange);
+      border-radius: 8px;
+      background: var(--white);
+    }
+
+    .callout h2,
+    .callout p {
+      margin: 0;
+    }
+
+    .callout p {
+      margin-top: 8px;
+      color: var(--muted);
+    }
+
+    footer {
+      padding: 36px 0 48px;
+      color: var(--muted);
+      font-size: 14px;
+    }
+
+    .footer-row {
+      display: flex;
+      justify-content: space-between;
+      gap: 24px;
+    }
+
+    @media (max-width: 820px) {
+      .nav-links a:not(.repo-link) {
+        display: none;
+      }
+
+      .hero {
+        min-height: auto;
+        padding: 64px 0 72px;
+      }
+
+      .feature-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .workflow,
+      .callout {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    @media (max-width: 520px) {
+      .shell {
+        width: min(100% - 28px, 1120px);
+      }
+
+      .brand span {
+        display: none;
+      }
+
+      h1 {
+        font-size: 42px;
+      }
+
+      .hero-copy {
+        font-size: 17px;
+      }
+
+      .band {
+        padding: 56px 0;
+      }
+
+      .footer-row {
+        display: block;
+      }
+    }
+  </style>
+</head>
+<body>
+  <header class="topbar">
+    <nav class="nav shell" aria-label="Primary navigation">
+      <a class="brand" href="#top">
+        <img src="./icon.png" alt="">
+        <span>C3 Contact Modification</span>
+      </a>
+      <div class="nav-links">
+        <a href="#features">Features</a>
+        <a href="#usage">Usage</a>
+        <a href="#install">Install</a>
+        <a class="repo-link" href="https://github.com/Wadprog/odoo-c3-contact-modification">GitHub</a>
+      </div>
+    </nav>
+  </header>
+
+  <main id="top">
+    <section class="hero">
+      <div class="shell">
+        <div class="hero-content">
+          <img class="hero-icon" src="./icon.png" alt="C3 Contact Modification app icon">
+          <p class="eyebrow">Odoo 19 addon</p>
+          <h1>C3 Contact Modification</h1>
+          <p class="hero-copy">
+            A focused extension of Odoo Contacts for consistent person records, protected
+            classification tags, and secure identity-document handling.
+          </p>
+          <div class="actions">
+            <a class="button primary" href="https://github.com/Wadprog/odoo-c3-contact-modification">View repository</a>
+            <a class="button" href="#install">Installation</a>
+          </div>
+          <ul class="facts" aria-label="Module facts">
+            <li><strong>Target:</strong> Odoo 19</li>
+            <li><strong>Languages:</strong> English and French</li>
+            <li><strong>License:</strong> LGPL-3</li>
+            <li><strong>Scope:</strong> Standard Contacts app</li>
+          </ul>
+        </div>
+      </div>
+    </section>
+
+    <section class="band soft" id="features">
+      <div class="shell">
+        <div class="section-head">
+          <p class="eyebrow">Capabilities</p>
+          <h2>Contact data that stays consistent</h2>
+          <p>The module extends existing Odoo models and views. It adds no separate application or parallel contact workflow.</p>
+        </div>
+        <div class="feature-grid">
+          <article class="feature">
+            <div class="feature-mark"></div>
+            <h3>Required gender for people</h3>
+            <p>Individual contacts select Male or Female. Companies do not display or require the field.</p>
+          </article>
+          <article class="feature">
+            <div class="feature-mark"></div>
+            <h3>Consistent contact names</h3>
+            <p>The person-name field guides users to enter the last name first, followed by the first name.</p>
+          </article>
+          <article class="feature">
+            <div class="feature-mark"></div>
+            <h3>Protected contact tags</h3>
+            <p>Twelve standard C3 tags are installed for people and companies, protected from rename, archive, and deletion.</p>
+          </article>
+          <article class="feature">
+            <div class="feature-mark"></div>
+            <h3>ID document storage</h3>
+            <p>Individual contacts can store one attachment-backed JPG, JPEG, or PNG identity document up to 5 MB.</p>
+          </article>
+          <article class="feature">
+            <div class="feature-mark"></div>
+            <h3>Click-to-preview viewer</h3>
+            <p>The full ID image loads only after Preview is clicked, then opens in Odoo's secured full-screen viewer.</p>
+          </article>
+          <article class="feature">
+            <div class="feature-mark"></div>
+            <h3>English and French</h3>
+            <p>User-facing labels and validation messages include French translations, including Sexe and Pièce d'identité.</p>
+          </article>
+        </div>
+      </div>
+    </section>
+
+    <section class="band" id="usage">
+      <div class="shell">
+        <div class="section-head">
+          <p class="eyebrow">Daily workflow</p>
+          <h2>Use the standard Contacts form</h2>
+          <p>All controls appear where contact users already work.</p>
+        </div>
+        <div class="workflow">
+          <h3>Create a person</h3>
+          <p>Open Contacts, select Individual, enter the last name followed by the first name, choose a gender, and assign relevant C3 tags.</p>
+        </div>
+        <div class="workflow">
+          <h3>Classify contacts</h3>
+          <p>Assign the installed tags to either people or companies: Acheteur, Démarcheur, Professeur, Auteur, Fournisseur, Employé, Contractuel, Librairie, Ecole, Administration publique, ONG, and Institution privée.</p>
+        </div>
+        <div class="workflow">
+          <h3>Manage an ID</h3>
+          <p>For an individual contact, open the ID Document tab to upload, download, replace, delete, or click Preview. Companies do not display this tab.</p>
+        </div>
+        <div class="workflow">
+          <h3>Protect sensitive files</h3>
+          <p>ID documents use Odoo's normal contact and attachment access checks. Preview uses the authenticated record-field route and does not create a public document URL.</p>
+        </div>
+      </div>
+    </section>
+
+    <section class="band soft" id="install">
+      <div class="shell">
+        <div class="section-head">
+          <p class="eyebrow">Installation</p>
+          <h2>Install as a standard Odoo addon</h2>
+          <p>Place the repository's addon directory on the Odoo addons path, update the app list, then install or upgrade the module.</p>
+        </div>
+        <div class="code-block" aria-label="Installation commands"># Install
+odoo -d &lt;database&gt; -i c3_contact_modification --stop-after-init
+
+# Upgrade
+odoo -d &lt;database&gt; -u c3_contact_modification --stop-after-init
+
+# Run addon tests with this repository's Docker setup
+docker compose run --rm web odoo -d c3_contact_test \
+  -i c3_contact_modification \
+  --test-enable \
+  --test-tags /c3_contact_modification \
+  --stop-after-init \
+  --without-demo=all</div>
+      </div>
+    </section>
+
+    <section class="band">
+      <div class="shell">
+        <div class="callout">
+          <div>
+            <h2>Project documentation</h2>
+            <p>Review the product requirements and verification guide for behavior, decisions, and test coverage.</p>
+          </div>
+          <div class="actions">
+            <a class="button" href="./contact_extension_prd.md">Contact PRD</a>
+            <a class="button" href="./contact_id_document_prd.md">ID Document PRD</a>
+            <a class="button" href="./end_to_end_verification.md">Verification</a>
+          </div>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <footer>
+    <div class="footer-row shell">
+      <span>C3 Contact Modification for Odoo 19</span>
+      <span><a href="https://github.com/Wadprog/odoo-c3-contact-modification">Source on GitHub</a></span>
+    </div>
+  </footer>
+</body>
+</html>
