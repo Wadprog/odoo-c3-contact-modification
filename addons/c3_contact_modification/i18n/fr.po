@@ -22,6 +22,16 @@ msgid "Gender"
 msgstr "Sexe"
 
 #. module: c3_contact_modification
+#: model:ir.model.fields,field_description:c3_contact_modification.field_res_partner__c3_id_document_attachment_id
+msgid "ID Document"
+msgstr "Pièce d'identité"
+
+#. module: c3_contact_modification
+#: code:addons/c3_contact_modification/models/res_partner.py:0
+msgid "ID documents are only available for individual contacts. Remove the ID document before changing this contact to a company."
+msgstr "Les pièces d'identité sont uniquement disponibles pour les contacts individuels. Supprimez la pièce d'identité avant de changer ce contact en société."
+
+#. module: c3_contact_modification
 #: model:ir.model.fields.selection,name:c3_contact_modification.selection__res_partner__gender__female
 msgid "Female"
 msgstr "Femme"
@@ -45,3 +55,13 @@ msgstr "Nom d'abord, puis prénom"
 #: code:addons/c3_contact_modification/models/res_partner_category.py:0
 msgid "This contact tag is protected by the contact setup module."
 msgstr "Cette étiquette de contact est protégée par le module de configuration des contacts."
+
+#. module: c3_contact_modification
+#: code:addons/c3_contact_modification/models/res_partner.py:0
+msgid "Only JPG and PNG identity document images are allowed."
+msgstr "Seules les images JPG et PNG de pièce d'identité sont autorisées."
+
+#. module: c3_contact_modification
+#: code:addons/c3_contact_modification/models/res_partner.py:0
+msgid "Identity document images must be 5 MB or smaller."
+msgstr "Les images de pièce d'identité doivent faire 5 Mo ou moins."
