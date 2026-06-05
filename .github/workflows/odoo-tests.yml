@@ -8,6 +8,10 @@ on:
     branches:
       - main
 
+concurrency:
+  group: odoo-addon-tests-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
 jobs:
   c3-contact-modification:
     name: c3_contact_modification
@@ -51,15 +55,32 @@ jobs:
           exit 1
 
       - name: Run addon tests
+        env:
+          TEST_DB: c3_contact_modification_ci_${{ github.run_id }}_${{ github.run_attempt }}
         run: |
           docker compose run --rm web odoo \
-            -d c3_contact_modification_ci_${{ github.run_id }}_${{ github.run_attempt }} \
+            -d "$TEST_DB" \
             -i c3_contact_modification \
             --test-enable \
             --test-tags /c3_contact_modification \
             --stop-after-init \
             --without-demo=all
 
+      - name: Collect Docker logs
+        if: failure()
+        run: |
+          mkdir -p ci-logs
+          docker compose ps > ci-logs/docker-compose-ps.txt
+          docker compose logs --no-color > ci-logs/docker-compose.log
+
       - name: Stop Docker services
         if: always()
         run: docker compose down -v
+
+      - name: Upload failure logs
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: odoo-ci-logs-${{ github.run_id }}-${{ github.run_attempt }}
+          path: ci-logs/
+          if-no-files-found: ignore

@@ -38,6 +38,12 @@ docker compose run --rm web odoo -d c3_contact_modification_ci_test -i c3_contac
 
 The `--test-tags /c3_contact_modification` flag is required. Without it, Odoo runs unrelated core/addon tests that are not the acceptance gate for this module.
 
+Each CI run uses a database name based on the GitHub run ID and attempt number, so test state is isolated between runs. The workflow cancels older in-progress runs for the same branch when a newer push arrives.
+
+If the workflow fails, it uploads Docker Compose service status and logs as a workflow artifact named `odoo-ci-logs-<run-id>-<attempt>`. Cleanup runs with `docker compose down -v` even when tests fail.
+
+After the workflow is stable on `main`, configure branch protection so `c3_contact_modification` is a required status check before pull requests can merge. Keep the required check scoped to this addon test command; do not replace it with a broad Odoo `--test-enable` run.
+
 ## Manual UI Verification
 
 Use the standard Contacts app. This addon must not add a standalone app, top-level menu, or separate contact workflow.
