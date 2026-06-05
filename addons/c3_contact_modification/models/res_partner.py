@@ -15,6 +15,12 @@ class ResPartner(models.Model):
         string="Gender",
         index=True,
     )
+    c3_id_document_attachment_id = fields.Many2one(
+        comodel_name="ir.attachment",
+        string="ID Document",
+        copy=False,
+        ondelete="set null",
+    )
 
     @api.constrains("gender", "is_company", "type")
     def _check_gender_required_for_individual_contacts(self):

@@ -22,6 +22,11 @@ msgid "Gender"
 msgstr "Sexe"
 
 #. module: c3_contact_modification
+#: model:ir.model.fields,field_description:c3_contact_modification.field_res_partner__c3_id_document_attachment_id
+msgid "ID Document"
+msgstr "Pièce d'identité"
+
+#. module: c3_contact_modification
 #: model:ir.model.fields.selection,name:c3_contact_modification.selection__res_partner__gender__female
 msgid "Female"
 msgstr "Femme"
