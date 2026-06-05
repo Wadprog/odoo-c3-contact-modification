@@ -95,6 +95,19 @@ class ResPartner(models.Model):
             raise ValidationError(_("Only JPG and PNG identity document images are allowed."))
 
     @api.model
+    def _c3_id_document_values_equal(self, left, right):
+        if not left and not right:
+            return True
+        if bool(left) != bool(right):
+            return False
+        try:
+            left_bytes = base64.b64decode(left, validate=False)
+            right_bytes = base64.b64decode(right, validate=False)
+        except (binascii.Error, TypeError):
+            return left == right
+        return left_bytes == right_bytes
+
+    @api.model
     def _c3_normalize_company_type(self, vals_list):
         for vals in vals_list:
             if "company_type" in vals:
@@ -124,7 +137,7 @@ class ResPartner(models.Model):
             elif new_document:
                 if not previous_document:
                     partner._c3_post_id_document_log("upload")
-                elif new_document != previous_document:
+                elif not self._c3_id_document_values_equal(new_document, previous_document):
                     partner._c3_post_id_document_log("replace")
 
     def _c3_post_id_document_log(self, action):
