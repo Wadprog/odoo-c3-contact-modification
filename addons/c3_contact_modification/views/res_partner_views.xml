@@ -17,6 +17,7 @@
                         <field
                             name="c3_id_document"
                             filename="c3_id_document_filename"
+                            widget="c3_id_document_binary"
                             options="{'accepted_file_extensions': '.jpg,.jpeg,.png', 'allowed_mime_type': 'image/jpeg,image/png'}"
                         />
                         <field name="c3_id_document_filename" invisible="1"/>
