@@ -1,6 +1,6 @@
 """Tests for attachment-backed contact ID document storage."""
 
-from odoo.tests import TransactionCase, tagged
+from odoo.tests import TransactionCase, new_test_user, tagged
 
 
 VALID_PNG_DATA = (
@@ -89,6 +89,29 @@ class TestContactIdDocumentStorage(TransactionCase):
         partner.c3_id_document = VALID_JPEG_DATA
 
         self.assertEqual(len(self._id_document_attachments(partner)), 1)
+
+    def test_normal_contact_user_can_delete_id_document_and_backing_attachment(self):
+        partner = self._create_partner()
+        partner.write(
+            {
+                "c3_id_document": VALID_PNG_DATA,
+                "c3_id_document_filename": "id-document.png",
+            }
+        )
+        attachment = self._id_document_attachments(partner)
+        contact_user = new_test_user(
+            self.env,
+            login="contact_document_editor",
+            groups="base.group_user,base.group_partner_manager",
+            gender="female",
+        )
+
+        partner.with_user(contact_user).write({"c3_id_document": False})
+
+        self.assertFalse(attachment.exists())
+        self.assertFalse(partner.c3_id_document)
+        self.assertFalse(partner.c3_id_document_filename)
+        self.assertFalse(self._id_document_attachments(partner))
 
     def test_company_contacts_start_without_id_document(self):
         company = self.env["res.partner"].create(

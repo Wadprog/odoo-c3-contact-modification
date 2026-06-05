@@ -1,6 +1,7 @@
 {
     "name": "C3 Contact Modification",
     "summary": "Extends Odoo Contacts with C3 contact setup customizations.",
+
     "description": """
     This module extends Odoo Contacts with C3 contact setup customizations.
     It adds a required Gender field for individual contacts, and protected contact tags for individuals and companies.
