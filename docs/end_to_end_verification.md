@@ -28,6 +28,16 @@ Expected result:
 - Required contact tags are not duplicated.
 - Protected tags remain protected.
 
+## GitHub Actions
+
+The repository CI runs the same addon-scoped test gate on every push and pull request:
+
+```bash
+docker compose run --rm web odoo -d c3_contact_modification_ci_test -i c3_contact_modification --test-enable --test-tags /c3_contact_modification --stop-after-init --without-demo=all
+```
+
+The `--test-tags /c3_contact_modification` flag is required. Without it, Odoo runs unrelated core/addon tests that are not the acceptance gate for this module.
+
 ## Manual UI Verification
 
 Use the standard Contacts app. This addon must not add a standalone app, top-level menu, or separate contact workflow.
