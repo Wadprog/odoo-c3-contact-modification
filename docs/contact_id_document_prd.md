@@ -18,6 +18,7 @@ The feature must not introduce a standalone app, top-level menu, or separate con
 4. As a Contacts user, I want to replace or delete the uploaded ID document, so that outdated or incorrect documents can be corrected.
 5. As a Contacts user, I want invalid files and oversized images blocked, so that only supported ID document images are stored.
 6. As a maintainer, I want ID document storage to allow only one current document per contact, so that the workflow remains simple and predictable.
+7. As a Contacts administrator, I want upload, replace, and delete actions on an ID document recorded on the contact chatter, so that I can see who changed a contact's ID document and what action they performed.
 
 ## Functional Requirements
 
@@ -52,6 +53,19 @@ Changing an individual contact to a company must be blocked while an ID document
 
 Deleting a contact must delete the attachment backing its ID document binary field.
 
+Uploading, replacing, or deleting an ID document on an individual contact must create one contact chatter log entry that identifies the acting user and the action performed. Log entries must appear in the contact's standard chatter history and must not include the binary file contents.
+
+ID document chatter log messages must be translated:
+
+- English upload: `%(user)s uploaded an ID document.`
+- French upload: `%(user)s a téléversé une pièce d'identité.`
+- English replace: `%(user)s replaced the ID document.`
+- French replace: `%(user)s a remplacé la pièce d'identité.`
+- English delete: `%(user)s deleted the ID document.`
+- French delete: `%(user)s a supprimé la pièce d'identité.`
+
+No chatter log entry may be created when the ID document value does not meaningfully change. Company contacts must not produce ID document log entries.
+
 ## Validation and Error Messages
 
 ID document upload validation messages must be translated:
@@ -79,7 +93,9 @@ ID document size validation messages must be translated:
 - Delete the backing attachment when the contact is deleted.
 - Prevent changing an individual contact with an ID document into a company until the ID document is removed.
 - Avoid copying the ID document binary field and filename when duplicating a contact.
-- Translate labels and validation messages for English and French.
+- Translate labels, validation messages, and ID document chatter log messages for English and French.
+- Post contact chatter log entries when an individual contact's ID document is uploaded, replaced, or deleted, using Odoo's standard contact messaging mechanism rather than a separate logging model.
+- Do not attach binary file contents to ID document log entries and do not store replaced document versions.
 - Do not add a new app launcher entry, top-level menu, or independent contact management screen.
 
 ## Testing Decisions
@@ -95,7 +111,11 @@ ID document size validation messages must be translated:
 - Verify changing an individual contact with an ID document into a company is blocked until the ID document is deleted.
 - Verify deleting a contact deletes its backing ID document attachment.
 - Verify users with contact access can view, upload, replace, and delete the ID document without an additional custom security group.
-- Verify English and French translations are loaded for labels and validation messages.
+- Verify English and French translations are loaded for labels, validation messages, and ID document chatter log messages.
+- Verify uploading an ID document creates one chatter log entry naming the acting user and indicating an upload.
+- Verify replacing an ID document creates one chatter log entry indicating a replacement, not an upload.
+- Verify deleting an ID document creates one chatter log entry indicating a deletion.
+- Verify no log entry is created when the ID document field is unchanged or for company contacts.
 - Avoid testing internal implementation details unless they become part of a stable interface.
 
 ## Out of Scope
@@ -105,7 +125,8 @@ ID document size validation messages must be translated:
 - Supporting non-image ID document files such as PDFs or Word documents.
 - Showing an ID document preview before the contact is saved.
 - Keeping historical versions of replaced ID documents.
-- Adding extra ID document metadata such as uploaded-by or upload date in the contact form.
+- Adding extra ID document metadata such as uploaded-by or upload date as fields on the ID Document tab.
+- Logging unsupported upload attempts blocked by validation.
 - Creating a new Contacts replacement app.
 - Creating custom standalone menus or independent contact views.
 - Adding reports, dashboards, or analytics.
