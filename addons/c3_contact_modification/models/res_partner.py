@@ -36,10 +36,12 @@ class ResPartner(models.Model):
     @api.model_create_multi
     def create(self, vals_list):
         self._c3_normalize_company_type(vals_list)
+        self._c3_normalize_id_document_deletion(vals_list)
         return super().create(vals_list)
 
     def write(self, vals):
         self._c3_normalize_company_type([vals])
+        self._c3_normalize_id_document_deletion([vals])
         return super().write(vals)
 
     @api.constrains("gender", "is_company", "type")
@@ -89,3 +91,9 @@ class ResPartner(models.Model):
         for vals in vals_list:
             if "company_type" in vals:
                 vals["is_company"] = vals["company_type"] == "company"
+
+    @api.model
+    def _c3_normalize_id_document_deletion(self, vals_list):
+        for vals in vals_list:
+            if "c3_id_document" in vals and vals["c3_id_document"] is False:
+                vals["c3_id_document_filename"] = False
