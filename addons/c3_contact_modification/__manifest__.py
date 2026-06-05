@@ -1,7 +1,7 @@
 {
     "name": "C3 Contact Modification",
     "summary": "Extends Odoo Contacts with C3 contact setup customizations.",
-    "version": "19.0.1.11.0",
+    "version": "19.0.1.12.0",
     "category": "Contacts",
     "author": "Wadprog",
     "license": "LGPL-3",
@@ -13,6 +13,7 @@
     "assets": {
         "web.assets_backend": [
             "c3_contact_modification/static/src/fields/c3_id_document_binary_field.js",
+            "c3_contact_modification/static/src/fields/c3_id_document_binary_field.xml",
         ],
         "web.assets_unit_tests": [
             "c3_contact_modification/static/tests/fields/c3_id_document_binary_field.test.js",
