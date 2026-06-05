@@ -1,0 +1,65 @@
+name: Odoo Addon Tests
+
+on:
+  push:
+    branches:
+      - "**"
+  pull_request:
+    branches:
+      - main
+
+jobs:
+  c3-contact-modification:
+    name: c3_contact_modification
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+
+      - name: Prepare Odoo config
+        run: |
+          mkdir -p config
+          printf '%s\n' 'qwertypassword' > odoo_pg_pass
+          cat > config/odoo.conf <<'EOF'
+          [options]
+          addons_path = /mnt/extra-addons
+          data_dir = /var/lib/odoo
+          db_host = db
+          db_port = 5432
+          db_user = odoo
+          db_password = qwertypassword
+          admin_passwd = admin
+          EOF
+
+      - name: Pull Docker images
+        run: docker compose pull
+
+      - name: Start database
+        run: docker compose up -d db
+
+      - name: Wait for database
+        run: |
+          for attempt in {1..30}; do
+            if docker compose exec -T db pg_isready -U odoo -d postgres; then
+              exit 0
+            fi
+            sleep 2
+          done
+          docker compose logs db
+          exit 1
+
+      - name: Run addon tests
+        run: |
+          docker compose run --rm web odoo \
+            -d c3_contact_modification_ci_${{ github.run_id }}_${{ github.run_attempt }} \
+            -i c3_contact_modification \
+            --test-enable \
+            --test-tags /c3_contact_modification \
+            --stop-after-init \
+            --without-demo=all
+
+      - name: Stop Docker services
+        if: always()
+        run: docker compose down -v
