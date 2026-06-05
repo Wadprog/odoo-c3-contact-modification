@@ -14,25 +14,25 @@ The feature must not introduce a standalone app, top-level menu, or separate con
 
 1. As a Contacts user, I want to upload one ID document image for an individual contact, so that national ID, passport, or similar identification can be stored with the contact.
 2. As a Contacts user, I want the ID document area hidden for companies, so that company contact forms do not show irrelevant individual-person fields.
-3. As a Contacts user, I want to view an uploaded ID document in Odoo's document viewer, so that I can inspect the document from the contact form.
+3. As a Contacts user, I want to view or download an uploaded ID document from the contact form, so that I can inspect the document.
 4. As a Contacts user, I want to replace or delete the uploaded ID document, so that outdated or incorrect documents can be corrected.
 5. As a Contacts user, I want invalid files and oversized images blocked, so that only supported ID document images are stored.
 6. As a maintainer, I want ID document storage to allow only one current document per contact, so that the workflow remains simple and predictable.
 
 ## Functional Requirements
 
-The ID document feature applies only to individual contacts. Company contacts must not show the ID document tab, upload control, viewer, or related actions.
+The ID document feature applies only to individual contacts. Company contacts must not show the ID document tab, binary-file control, or related actions.
 
 The visible label must be translated:
 
 - English: `ID Document`
 - French: `Pièce d'identité`
 
-The ID document UI must appear in its own tab next to the standard contact `Notes` tab. The tab should contain only the document viewer and the controls needed to upload, replace, or delete the ID document.
+The ID document UI must appear in its own tab next to the standard contact `Notes` tab. The tab should use Odoo's standard binary-file experience for upload, view/download, replace, and delete.
 
-The uploaded ID must be stored as a dedicated Odoo attachment linked to the contact. It must be separate from general contact attachments and must not rely on the chatter attachment list as the primary UI. The implementation should use a dedicated reference or metadata strategy so the addon can reliably identify the one ID document attachment for each contact.
+The uploaded ID must use an attachment-backed Odoo `Binary` field linked to the contact. Odoo must store the file through `ir.attachment`, while the standard binary widget remains the primary UI.
 
-Only one ID document may be stored per contact. Replacing the ID document must delete the previous ID attachment and store the new one as the current ID document. Deleting the ID document must remove the attachment.
+Only one ID document may be stored per contact. Replacing or deleting the ID document must use Odoo's standard attachment-backed binary-field lifecycle.
 
 Allowed file formats:
 
@@ -42,7 +42,7 @@ Allowed file formats:
 
 Uploads must be blocked when the file is not one of the allowed image formats. Uploads must also be blocked when the file is larger than 5 MB.
 
-The document viewer is only required after the contact has been saved. Unsaved-contact preview is out of scope.
+Viewing or downloading the document is only required after the contact has been saved. Unsaved-contact preview is out of scope.
 
 Any user who can view and edit the contact may view, upload, replace, and delete the contact's ID document. No additional access group is required for this feature.
 
@@ -50,7 +50,7 @@ Duplicating an individual contact that has an ID document must create the duplic
 
 Changing an individual contact to a company must be blocked while an ID document exists. The user must delete the ID document before changing the contact to a company.
 
-Deleting a contact must delete its dedicated ID document attachment.
+Deleting a contact must delete the attachment backing its ID document binary field.
 
 ## Validation and Error Messages
 
@@ -67,16 +67,18 @@ ID document size validation messages must be translated:
 ## Implementation Decisions
 
 - Build this as part of the existing Odoo 19 addon under the local `addons` directory.
-- Store individual contact ID documents as dedicated `ir.attachment` records linked to the contact.
-- Track the dedicated ID document attachment separately from general contact attachments so the feature can enforce one current ID document per contact.
-- Add an inherited Contacts form tab next to `Notes` for the ID document viewer and upload/replace/delete controls.
+- Store individual contact ID documents in a `fields.Binary` field with `attachment=True` and `copy=False`.
+- Add a filename field for Odoo's standard binary widget.
+- Let Odoo manage the backing `ir.attachment` lifecycle and keep it separate from general contact attachments through the binary field's `res_field`.
+- Migrate documents stored by the earlier explicit-attachment reference into the attachment-backed binary field and preserve their filenames.
+- Add an inherited Contacts form tab next to `Notes` for the standard binary upload/view/download/replace/delete controls.
 - Hide the ID document tab and controls for company contacts.
 - Validate ID document uploads by MIME type and/or file extension so only JPG, JPEG, and PNG images are accepted.
 - Enforce a 5 MB maximum ID document image size.
-- Delete the previous ID document attachment when a replacement is uploaded.
-- Delete the dedicated ID document attachment when the contact is deleted.
+- Use Odoo's standard attachment-backed binary lifecycle when replacing or deleting the ID document.
+- Delete the backing attachment when the contact is deleted.
 - Prevent changing an individual contact with an ID document into a company until the ID document is removed.
-- Avoid copying the ID document attachment when duplicating a contact.
+- Avoid copying the ID document binary field and filename when duplicating a contact.
 - Translate labels and validation messages for English and French.
 - Do not add a new app launcher entry, top-level menu, or independent contact management screen.
 
@@ -86,12 +88,12 @@ ID document size validation messages must be translated:
 - Verify an individual contact can upload one JPG, JPEG, or PNG ID document up to 5 MB.
 - Verify unsupported file formats are rejected with the translated validation message.
 - Verify image files larger than 5 MB are rejected with the translated validation message.
-- Verify the uploaded ID document opens in Odoo's document viewer after the contact is saved.
-- Verify replacing an ID document deletes the previous ID attachment.
-- Verify deleting an ID document removes the dedicated attachment.
+- Verify the uploaded ID document can be viewed or downloaded through Odoo's standard binary widget after the contact is saved.
+- Verify replacing an ID document leaves one current backing attachment.
+- Verify deleting an ID document removes its backing attachment.
 - Verify duplicating a contact does not copy the ID document.
 - Verify changing an individual contact with an ID document into a company is blocked until the ID document is deleted.
-- Verify deleting a contact deletes its dedicated ID document attachment.
+- Verify deleting a contact deletes its backing ID document attachment.
 - Verify users with contact access can view, upload, replace, and delete the ID document without an additional custom security group.
 - Verify English and French translations are loaded for labels and validation messages.
 - Avoid testing internal implementation details unless they become part of a stable interface.

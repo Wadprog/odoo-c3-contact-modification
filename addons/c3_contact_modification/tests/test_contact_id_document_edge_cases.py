@@ -18,40 +18,43 @@ class TestContactIdDocumentEdgeCases(TransactionCase):
             }
         )
 
-    def _create_attachment(self, partner, name="id-document.png"):
-        return self.env["ir.attachment"].create(
-            {
-                "name": name,
-                "datas": VALID_PNG_DATA,
-                "mimetype": "image/png",
-                "res_model": "res.partner",
-                "res_id": partner.id,
-            }
-        )
-
     def _create_partner_with_id_document(self):
         partner = self._create_partner()
-        attachment = self._create_attachment(partner)
-        partner.c3_id_document_attachment_id = attachment
-        return partner, attachment
+        partner.write(
+            {
+                "c3_id_document": VALID_PNG_DATA,
+                "c3_id_document_filename": "id-document.png",
+            }
+        )
+        return partner
+
+    def _id_document_attachments(self, partner):
+        return self.env["ir.attachment"].search(
+            [
+                ("res_model", "=", "res.partner"),
+                ("res_id", "=", partner.id),
+                ("res_field", "=", "c3_id_document"),
+            ]
+        )
 
     def test_duplicating_contact_does_not_copy_id_document(self):
-        partner, _attachment = self._create_partner_with_id_document()
+        partner = self._create_partner_with_id_document()
 
         duplicate = partner.copy({"name": "Doe Alice Copy"})
 
-        self.assertFalse(duplicate.c3_id_document_attachment_id)
+        self.assertFalse(duplicate.c3_id_document)
+        self.assertFalse(duplicate.c3_id_document_filename)
 
     def test_deleting_contact_deletes_id_document_attachment(self):
-        partner, attachment = self._create_partner_with_id_document()
-        attachment_id = attachment.id
+        partner = self._create_partner_with_id_document()
+        attachment = self._id_document_attachments(partner)
 
         partner.unlink()
 
-        self.assertFalse(self.env["ir.attachment"].browse(attachment_id).exists())
+        self.assertFalse(attachment.exists())
 
     def test_changing_individual_with_id_document_to_company_is_blocked(self):
-        partner, _attachment = self._create_partner_with_id_document()
+        partner = self._create_partner_with_id_document()
 
         with self.assertRaisesRegex(
             ValidationError,
@@ -60,13 +63,18 @@ class TestContactIdDocumentEdgeCases(TransactionCase):
             partner.is_company = True
 
     def test_changing_individual_to_company_succeeds_after_id_document_is_removed(self):
-        partner, _attachment = self._create_partner_with_id_document()
+        partner = self._create_partner_with_id_document()
 
-        partner.c3_id_document_attachment_id = False
-        partner.is_company = True
+        partner.write(
+            {
+                "c3_id_document": False,
+                "c3_id_document_filename": False,
+                "is_company": True,
+            }
+        )
 
         self.assertTrue(partner.is_company)
-        self.assertFalse(partner.c3_id_document_attachment_id)
+        self.assertFalse(partner.c3_id_document)
 
     def test_company_contact_cannot_keep_id_document(self):
         company = self.env["res.partner"].create(
@@ -76,10 +84,9 @@ class TestContactIdDocumentEdgeCases(TransactionCase):
                 "type": "contact",
             }
         )
-        attachment = self._create_attachment(company)
 
         with self.assertRaisesRegex(
             ValidationError,
             "ID documents are only available for individual contacts.",
         ):
-            company.c3_id_document_attachment_id = attachment
+            company.c3_id_document = VALID_PNG_DATA

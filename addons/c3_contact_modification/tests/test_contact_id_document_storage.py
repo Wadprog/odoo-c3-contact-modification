@@ -1,4 +1,4 @@
-"""Tests for contact ID document attachment storage."""
+"""Tests for attachment-backed contact ID document storage."""
 
 from odoo.tests import TransactionCase, tagged
 
@@ -7,30 +7,26 @@ VALID_PNG_DATA = (
     "iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mP8/x8AAwMB/"
     "axzZ3cAAAAASUVORK5CYII="
 )
+VALID_JPEG_DATA = (
+    "/9j/4AAQSkZJRgABAQAAAQABAAD/2wBDAAgGBgcGBQgHBwcJCQgKDBQNDAsLDBkSEw8UHRof"
+    "Hh0aHBwgJC4nICIsIxwcKDcpLDAxNDQ0Hyc5PTgyPC4zNDL/2wBDAQkJCQwLDBgNDRgyIRwh"
+    "MjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjL/wAAR"
+    "CAABAAEDASIAAhEBAxEB/8QAHwAAAQUBAQEBAQEAAAAAAAAAAAECAwQFBgcICQoL/8QAtRAAAg"
+    "EDAwIEAwUFBAQAAAF9AQIDAAQRBRIhMUEGE1FhByJxFDKBkaEII0KxwRVS0fAkM2JyggkKFhcY"
+    "GRolJicoKSo0NTY3ODk6Q0RFRkdISUpTVFVWV1hZWmNkZWZnaGlqc3R1dnd4eXqDhIWGh4iJip"
+    "KTlJWWl5iZmqKjpKWmp6ipqrKztLW2t7i5usLDxMXGx8jJytLT1NXW19jZ2uHi4+Tl5ufo6er"
+    "x8vP09fb3+Pn6/8QAHwEAAwEBAQEBAQEBAQAAAAAAAAECAwQFBgcICQoL/8QAtREAAgECBAQDB"
+    "AcFBAQAAQJ3AAECAxEEBSExBhJBUQdhcRMiMoEIFEKRobHBCSMzUvAVYnLRChYkNOEl8RcYGRom"
+    "JygpKjU2Nzg5OkNERUZHSElKU1RVVldYWVpjZGVmZ2hpanN0dXZ3eHl6goOEhYaHiImKkpOUlZa"
+    "XmJmaoqOkpaanqKmqsrO0tba3uLm6wsPExcbHyMnK0tPU1dbX2Nna4uPk5ebn6Onq8vP09fb3+"
+    "Pn6/9oADAMBAAIRAxEAPwD3+iiigD//2Q=="
+)
 
 
 @tagged("post_install", "-at_install")
 class TestContactIdDocumentStorage(TransactionCase):
-    def _create_attachment(self, partner, name="id-document.png", mimetype="image/png", datas=None):
-        return self.env["ir.attachment"].create(
-            {
-                "name": name,
-                "datas": datas or VALID_PNG_DATA,
-                "mimetype": mimetype,
-                "res_model": "res.partner",
-                "res_id": partner.id,
-            }
-        )
-
-    def test_id_document_attachment_field_is_registered(self):
-        field = self.env["res.partner"]._fields["c3_id_document_attachment_id"]
-
-        self.assertEqual(field.type, "many2one")
-        self.assertEqual(field.comodel_name, "ir.attachment")
-        self.assertFalse(field.copy)
-
-    def test_individual_contact_can_reference_one_id_document_attachment(self):
-        partner = self.env["res.partner"].create(
+    def _create_partner(self):
+        return self.env["res.partner"].create(
             {
                 "name": "Doe Alice",
                 "is_company": False,
@@ -38,50 +34,63 @@ class TestContactIdDocumentStorage(TransactionCase):
                 "gender": "female",
             }
         )
-        attachment = self._create_attachment(partner)
 
-        partner.c3_id_document_attachment_id = attachment
+    def _id_document_attachments(self, partner):
+        return self.env["ir.attachment"].search(
+            [
+                ("res_model", "=", "res.partner"),
+                ("res_id", "=", partner.id),
+                ("res_field", "=", "c3_id_document"),
+            ]
+        )
 
-        self.assertEqual(partner.c3_id_document_attachment_id, attachment)
-        self.assertEqual(partner.c3_id_document_attachment_id.res_model, "res.partner")
-        self.assertEqual(partner.c3_id_document_attachment_id.res_id, partner.id)
+    def test_id_document_binary_field_is_attachment_backed(self):
+        field = self.env["res.partner"]._fields["c3_id_document"]
 
-    def test_id_document_attachment_is_distinct_from_general_contact_attachments(self):
-        partner = self.env["res.partner"].create(
+        self.assertEqual(field.type, "binary")
+        self.assertTrue(field.attachment)
+        self.assertFalse(field.copy)
+
+    def test_individual_contact_can_store_one_id_document(self):
+        partner = self._create_partner()
+
+        partner.write(
             {
-                "name": "Doe John",
-                "is_company": False,
-                "type": "contact",
-                "gender": "male",
+                "c3_id_document": VALID_PNG_DATA,
+                "c3_id_document_filename": "id-document.png",
             }
         )
-        id_attachment = self._create_attachment(partner, "id-document.png")
-        general_attachment = self._create_attachment(partner, "general-note.png")
 
-        partner.c3_id_document_attachment_id = id_attachment
+        self.assertTrue(partner.c3_id_document)
+        self.assertEqual(partner.c3_id_document_filename, "id-document.png")
+        self.assertEqual(len(self._id_document_attachments(partner)), 1)
 
-        self.assertEqual(partner.c3_id_document_attachment_id, id_attachment)
-        self.assertNotEqual(partner.c3_id_document_attachment_id, general_attachment)
-
-    def test_only_one_current_id_document_attachment_is_referenced(self):
-        partner = self.env["res.partner"].create(
+    def test_id_document_attachment_is_distinct_from_general_attachments(self):
+        partner = self._create_partner()
+        general_attachment = self.env["ir.attachment"].create(
             {
-                "name": "Doe Jane",
-                "is_company": False,
-                "type": "contact",
-                "gender": "female",
+                "name": "general-note.png",
+                "datas": VALID_PNG_DATA,
+                "res_model": "res.partner",
+                "res_id": partner.id,
             }
         )
-        first_attachment = self._create_attachment(partner, "first-id.png")
-        second_attachment = self._create_attachment(partner, "second-id.png")
 
-        partner.c3_id_document_attachment_id = first_attachment
-        partner.c3_id_document_attachment_id = second_attachment
+        partner.c3_id_document = VALID_PNG_DATA
 
-        self.assertEqual(partner.c3_id_document_attachment_id, second_attachment)
-        self.assertNotEqual(partner.c3_id_document_attachment_id, first_attachment)
+        id_document_attachment = self._id_document_attachments(partner)
+        self.assertEqual(len(id_document_attachment), 1)
+        self.assertNotEqual(id_document_attachment, general_attachment)
 
-    def test_company_contacts_start_without_id_document_attachment(self):
+    def test_replacing_id_document_keeps_one_backing_attachment(self):
+        partner = self._create_partner()
+        partner.c3_id_document = VALID_PNG_DATA
+
+        partner.c3_id_document = VALID_JPEG_DATA
+
+        self.assertEqual(len(self._id_document_attachments(partner)), 1)
+
+    def test_company_contacts_start_without_id_document(self):
         company = self.env["res.partner"].create(
             {
                 "name": "C3 Test Company",
@@ -90,4 +99,4 @@ class TestContactIdDocumentStorage(TransactionCase):
             }
         )
 
-        self.assertFalse(company.c3_id_document_attachment_id)
+        self.assertFalse(company.c3_id_document)
