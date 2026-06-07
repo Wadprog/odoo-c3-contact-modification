@@ -55,6 +55,7 @@ class TestAddonEndToEnd(TransactionCase):
                     "name": "Missing Gender",
                     "is_company": False,
                     "type": "contact",
+                    "date_of_birth": date(1991, 2, 3),
                 }
             )
 
