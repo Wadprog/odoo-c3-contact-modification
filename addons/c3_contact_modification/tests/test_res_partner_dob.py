@@ -17,6 +17,7 @@ class TestResPartnerDateOfBirth(TransactionCase):
         partner = self.env["res.partner"].create(
             {
                 "name": "Doe John",
+                "gender": "male",
                 "date_of_birth": date(1990, 1, 2),
             }
         )
@@ -42,6 +43,7 @@ class TestResPartnerDateOfBirth(TransactionCase):
                 "name": "Doe Jane",
                 "is_company": False,
                 "type": "contact",
+                "gender": "female",
                 "date_of_birth": date(1991, 4, 5),
             }
         )
@@ -95,6 +97,7 @@ class TestResPartnerDateOfBirth(TransactionCase):
                 "is_company": False,
                 "type": "contact",
                 "date_of_birth": date(1992, 6, 7),
+                "gender": "female",
             }
         )
 

@@ -1,5 +1,7 @@
 """End-to-end verification for the C3 contact modification addon."""
 
+from datetime import date, timedelta
+
 from lxml import etree
 
 from odoo import Command
@@ -24,6 +26,7 @@ class TestAddonEndToEnd(TransactionCase):
                 "is_company": False,
                 "type": "contact",
                 "gender": "female",
+                "date_of_birth": date(1990, 1, 2),
                 "category_id": [Command.link(protected_tag.id)],
             }
         )
@@ -37,8 +40,10 @@ class TestAddonEndToEnd(TransactionCase):
         )
 
         self.assertEqual(person.gender, "female")
+        self.assertEqual(person.date_of_birth, date(1990, 1, 2))
         self.assertIn(protected_tag, person.category_id)
         self.assertFalse(company.gender)
+        self.assertFalse(company.date_of_birth)
         self.assertIn(protected_tag, company.category_id)
 
         with self.assertRaisesRegex(
@@ -50,6 +55,34 @@ class TestAddonEndToEnd(TransactionCase):
                     "name": "Missing Gender",
                     "is_company": False,
                     "type": "contact",
+                    "date_of_birth": date(1991, 2, 3),
+                }
+            )
+
+        with self.assertRaisesRegex(
+            ValidationError,
+            "Date of birth is required for individual contacts.",
+        ):
+            partners.create(
+                {
+                    "name": "Missing DOB",
+                    "is_company": False,
+                    "type": "contact",
+                    "gender": "female",
+                }
+            )
+
+        with self.assertRaisesRegex(
+            ValidationError,
+            "Date of birth cannot be in the future.",
+        ):
+            partners.create(
+                {
+                    "name": "Future DOB",
+                    "is_company": False,
+                    "type": "contact",
+                    "gender": "female",
+                    "date_of_birth": date.today() + timedelta(days=1),
                 }
             )
 
@@ -67,10 +100,13 @@ class TestAddonEndToEnd(TransactionCase):
         arch = etree.fromstring(view["arch"].encode())
 
         gender_fields = arch.xpath("//field[@name='gender']")
+        dob_fields = arch.xpath("//field[@name='date_of_birth']")
         individual_name_fields = arch.xpath("//field[@name='name' and @invisible='is_company']")
 
         self.assertEqual(len(gender_fields), 1)
         self.assertEqual(gender_fields[0].get("invisible"), "is_company")
+        self.assertEqual(len(dob_fields), 1)
+        self.assertEqual(dob_fields[0].get("invisible"), "is_company")
         self.assertEqual(len(individual_name_fields), 1)
         self.assertEqual(
             individual_name_fields[0].get("placeholder"),

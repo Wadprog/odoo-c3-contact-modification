@@ -14,7 +14,7 @@ Expected result:
 
 - The addon installs cleanly.
 - Post-install tests complete with `0 failed`.
-- The suite verifies gender model behavior, contact form view inheritance, required tags, protected tag behavior, and an end-to-end contact workflow.
+- The suite verifies gender and date of birth model behavior, contact form view inheritance, required tags, protected tag behavior, and an end-to-end contact workflow.
 
 Run the same command again with `-u c3_contact_modification` against an existing database when verifying upgrade behavior:
 
@@ -54,14 +54,20 @@ Use the standard Contacts app. This addon must not add a standalone app, top-lev
 - Create an individual contact.
 - Confirm the name field shows the placeholder `Last name first, then first name`.
 - Confirm the `Gender` field appears on the main contact form.
+- Confirm the `Date of Birth` field appears on the main contact form.
 - Try saving without gender and confirm Odoo blocks the save with `Gender is required for individual contacts.`
+- Try saving without a date of birth and confirm Odoo blocks the save with `Date of birth is required for individual contacts.`
+- Try saving with a future date of birth and confirm Odoo blocks the save with `Date of birth cannot be in the future.`
 - Select `Male` or `Female` and confirm the contact saves.
+- Set a valid date of birth and confirm the contact saves.
 
 ### Company Contacts
 
 - Create a company contact.
 - Confirm the `Gender` field is hidden.
+- Confirm the `Date of Birth` field is hidden.
 - Confirm the company saves without gender.
+- Confirm the company saves without a date of birth.
 
 ### Contact Tags
 
@@ -78,7 +84,10 @@ Use the standard Contacts app. This addon must not add a standalone app, top-lev
 
 - Switch the user language to French.
 - Confirm `Gender` displays as `Sexe`.
+- Confirm `Date of Birth` displays as `Date de naissance`.
 - Confirm `Male` and `Female` display as `Homme` and `Femme`.
 - Confirm the name placeholder displays as `Nom d'abord, puis prénom`.
 - Confirm the missing-gender validation message displays as `Le sexe est obligatoire pour les contacts individuels.`
+- Confirm the missing-DOB validation message displays as `La date de naissance est obligatoire pour les contacts individuels.`
+- Confirm the future-DOB validation message displays as `La date de naissance ne peut pas être dans le futur.`
 - Confirm the protected-tag error displays as `Cette étiquette de contact est protégée par le module de configuration des contacts.`

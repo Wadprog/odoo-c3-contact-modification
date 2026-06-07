@@ -145,6 +145,7 @@ docker-compose.yaml              Local Odoo and PostgreSQL services
 
 - [Module page](https://wadprog.github.io/odoo-c3-contact-modification/)
 - [Contact extension PRD](docs/contact_extension_prd.md)
+- [Contact date of birth PRD](docs/contact_dob_prd.md)
 - [ID document PRD](docs/contact_id_document_prd.md)
 - [End-to-end verification guide](docs/end_to_end_verification.md)
 - [Addon README](addons/c3_contact_modification/README.md)
