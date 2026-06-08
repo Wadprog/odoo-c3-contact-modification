@@ -18,6 +18,7 @@
     "depends": ["contacts"],
     "data": [
         "data/contact_tags.xml",
+        "data/visit_reasons.xml",
         "views/res_partner_views.xml",
     ],
     "assets": {
