@@ -1,5 +1,7 @@
 """Tests for required contact tag setup."""
 
+from datetime import date
+
 from odoo import Command
 from odoo.exceptions import UserError
 from odoo.tests import TransactionCase, tagged
@@ -58,7 +60,9 @@ class TestContactTags(TransactionCase):
             {
                 "name": "Doe John",
                 "is_company": False,
+                "type": "contact",
                 "gender": "male",
+                "date_of_birth": date(1990, 1, 2),
                 "category_id": [Command.link(tag.id)],
             }
         )
