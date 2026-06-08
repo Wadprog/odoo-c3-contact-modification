@@ -19,7 +19,9 @@ C3_CONTACT_TAGS = [
     ("contact_tag_administration_publique", "Administration publique"),
     ("contact_tag_ong", "ONG"),
     ("contact_tag_institution_privee", "Institution privée"),
+    ("contact_tag_site", "Site"),
 ]
+
 
 
 class ResPartnerCategory(models.Model):
