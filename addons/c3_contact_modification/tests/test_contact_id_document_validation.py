@@ -1,6 +1,7 @@
 """Tests for contact ID document binary validation."""
 
 import base64
+from datetime import date
 
 from odoo.exceptions import ValidationError
 from odoo.tests import TransactionCase, tagged
@@ -17,6 +18,7 @@ class TestContactIdDocumentValidation(TransactionCase):
                 "is_company": False,
                 "type": "contact",
                 "gender": "female",
+                "date_of_birth": date(1990, 1, 2),
             }
         )
 
