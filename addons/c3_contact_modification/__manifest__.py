@@ -17,6 +17,7 @@
     "license": "LGPL-3",
     "depends": ["contacts"],
     "data": [
+        "security/ir.model.access.csv",
         "data/contact_tags.xml",
         "data/visit_reasons.xml",
         "views/res_partner_views.xml",
