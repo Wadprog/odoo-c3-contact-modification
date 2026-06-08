@@ -22,6 +22,21 @@ msgid "Gender"
 msgstr "Sexe"
 
 #. module: c3_contact_modification
+#: model:ir.model.fields,field_description:c3_contact_modification.field_res_partner__date_of_birth
+msgid "Date of Birth"
+msgstr "Date de naissance"
+
+#. module: c3_contact_modification
+#: code:addons/c3_contact_modification/models/res_partner.py:0
+msgid "Date of birth is required for individual contacts."
+msgstr "La date de naissance est obligatoire pour les contacts individuels."
+
+#. module: c3_contact_modification
+#: code:addons/c3_contact_modification/models/res_partner.py:0
+msgid "Date of birth cannot be in the future."
+msgstr "La date de naissance ne peut pas être dans le futur."
+
+#. module: c3_contact_modification
 #: model:ir.model.fields,field_description:c3_contact_modification.field_res_partner__c3_id_document
 #: model_terms:ir.ui.view,arch_db:c3_contact_modification.view_partner_form_inherit_gender
 msgid "ID Document"

@@ -10,6 +10,7 @@
             </xpath>
             <xpath expr="//field[@name='function']" position="after">
                 <field name="gender" invisible="is_company"/>
+                <field name="date_of_birth" invisible="is_company"/>
             </xpath>
             <xpath expr="//page[@name='internal_notes']" position="after">
                 <page name="c3_id_document" string="ID Document" invisible="is_company">

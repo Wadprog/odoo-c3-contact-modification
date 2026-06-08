@@ -1,5 +1,7 @@
 """Tests for attachment-backed contact ID document storage."""
 
+from datetime import date
+
 from odoo.tests import TransactionCase, new_test_user, tagged
 
 
@@ -32,6 +34,7 @@ class TestContactIdDocumentStorage(TransactionCase):
                 "is_company": False,
                 "type": "contact",
                 "gender": "female",
+                "date_of_birth": date(1990, 1, 2),
             }
         )
 

@@ -1,5 +1,7 @@
 """Tests for contact ID document lifecycle edge cases."""
 
+from datetime import date
+
 from odoo.exceptions import ValidationError
 from odoo.tests import Form, TransactionCase, tagged
 from odoo.tools.safe_eval import safe_eval
@@ -16,6 +18,7 @@ class TestContactIdDocumentEdgeCases(TransactionCase):
                 "is_company": False,
                 "type": "contact",
                 "gender": "female",
+                "date_of_birth": date(1990, 1, 2),
             }
         )
 

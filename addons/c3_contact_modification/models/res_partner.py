@@ -15,6 +15,10 @@ ID_DOCUMENT_MAX_SIZE = 5 * 1024 * 1024
 class ResPartner(models.Model):
     _inherit = "res.partner"
 
+    date_of_birth = fields.Date(
+        string="Date of Birth",
+        index=True,
+    )
     gender = fields.Selection(
         selection=[
             ("male", "Male"),
@@ -58,6 +62,18 @@ class ResPartner(models.Model):
             if partner._is_c3_individual_contact_without_gender():
                 raise ValidationError(_("Gender is required for individual contacts."))
 
+    @api.constrains("date_of_birth", "is_company", "type")
+    def _check_date_of_birth_required_for_individual_contacts(self):
+        for partner in self:
+            if partner._is_c3_individual_contact_without_date_of_birth():
+                raise ValidationError(
+                    _("Date of birth is required for individual contacts.")
+                )
+            if partner.date_of_birth and partner.date_of_birth > fields.Date.context_today(
+                partner
+            ):
+                raise ValidationError(_("Date of birth cannot be in the future."))
+
     @api.constrains("c3_id_document", "is_company")
     def _check_c3_id_document_individual_only(self):
         for partner in self:
@@ -77,7 +93,21 @@ class ResPartner(models.Model):
 
     def _is_c3_individual_contact_without_gender(self):
         self.ensure_one()
-        return not self.is_company and self.type == "contact" and not self.gender
+        return (
+            not self.is_company
+            and self.type == "contact"
+            and not self.parent_id
+            and not self.gender
+        )
+
+    def _is_c3_individual_contact_without_date_of_birth(self):
+        self.ensure_one()
+        return (
+            not self.is_company
+            and self.type == "contact"
+            and not self.parent_id
+            and not self.date_of_birth
+        )
 
     def _validate_c3_id_document(self, encoded_document):
         self.ensure_one()

@@ -1,5 +1,7 @@
 """Tests for the contact gender field."""
 
+from datetime import date
+
 from odoo.exceptions import ValidationError
 from odoo.tests import TransactionCase, tagged
 
@@ -23,6 +25,7 @@ class TestResPartnerGender(TransactionCase):
             {
                 "name": "Doe John",
                 "gender": "male",
+                "date_of_birth": date(1990, 1, 2),
             }
         )
 
@@ -35,11 +38,12 @@ class TestResPartnerGender(TransactionCase):
         ):
             self.env["res.partner"].create(
                 {
-                    "name": "Doe Jane",
-                    "is_company": False,
-                    "type": "contact",
-                }
-            )
+                "name": "Doe Jane",
+                "is_company": False,
+                "type": "contact",
+                "date_of_birth": date(1991, 4, 5),
+            }
+        )
 
     def test_individual_contact_requires_gender_on_write(self):
         partner = self.env["res.partner"].create(
@@ -74,6 +78,26 @@ class TestResPartnerGender(TransactionCase):
                 "name": "C3 Test Invoice Address",
                 "is_company": False,
                 "type": "invoice",
+                "date_of_birth": date(1992, 6, 7),
+            }
+        )
+
+        self.assertFalse(partner.gender)
+
+    def test_child_contact_does_not_require_gender(self):
+        parent = self.env["res.partner"].create(
+            {
+                "name": "C3 Test Parent Company",
+                "is_company": True,
+                "type": "contact",
+            }
+        )
+        partner = self.env["res.partner"].create(
+            {
+                "name": "C3 Test Child Contact",
+                "parent_id": parent.id,
+                "is_company": False,
+                "type": "contact",
             }
         )
 

@@ -1,5 +1,7 @@
 """Tests for contact ID document chatter audit logging."""
 
+from datetime import date
+
 from odoo.exceptions import ValidationError
 from odoo.tests import TransactionCase, new_test_user, tagged
 from odoo.tools import html2plaintext
@@ -21,6 +23,7 @@ class TestContactIdDocumentAuditLog(TransactionCase):
                 "is_company": False,
                 "type": "contact",
                 "gender": "female",
+                "date_of_birth": date(1990, 1, 2),
             }
         )
 
@@ -79,6 +82,7 @@ class TestContactIdDocumentAuditLog(TransactionCase):
                 "is_company": False,
                 "type": "contact",
                 "gender": "female",
+                "date_of_birth": date(1990, 1, 2),
                 "c3_id_document": VALID_PNG_DATA,
                 "c3_id_document_filename": "id-document.png",
             }
