@@ -23,6 +23,9 @@ class ResPartnerVisit(models.Model):
         ondelete="restrict",
         index=True,
     )
+    note = fields.Text(
+        string="Note",
+    )
 
     @api.model_create_multi
     def create(self, vals_list):

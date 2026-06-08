@@ -28,11 +28,16 @@ class TestResPartnerVisit(TransactionCase):
         reason = self.env["c3.contact.visit.reason"].create({"name": "Visit"})
 
         visit = self.env["c3.contact.visit"].create(
-            {"partner_id": partner.id, "visit_reason_id": reason.id}
+            {
+                "partner_id": partner.id,
+                "visit_reason_id": reason.id,
+                "note": "Called in to ask about a new book.",
+            }
         )
 
         self.assertEqual(visit.partner_id, partner)
         self.assertEqual(visit.visit_reason_id, reason)
+        self.assertEqual(visit.note, "Called in to ask about a new book.")
         self.assertTrue(visit.create_date)
 
     def test_visit_records_cannot_be_edited(self):
