@@ -1,7 +1,7 @@
 """Visit records for C3 contact modification."""
 
 from odoo import api, fields, models, _
-from odoo.exceptions import UserError
+from odoo.exceptions import ValidationError, UserError
 
 
 class ResPartnerVisit(models.Model):
@@ -23,12 +23,25 @@ class ResPartnerVisit(models.Model):
         ondelete="restrict",
         index=True,
     )
+    site_id = fields.Many2one(
+        comodel_name="res.partner",
+        string="Site",
+        required=True,
+        domain=[("category_id.name", "=", "Site")],
+        ondelete="restrict",
+        index=True,
+    )
     note = fields.Text(
         string="Note",
     )
 
     @api.model_create_multi
     def create(self, vals_list):
+        for vals in vals_list:
+            if not vals.get("visit_reason_id"):
+                raise ValidationError(_("Visit reason is required."))
+            if not vals.get("site_id"):
+                raise ValidationError(_("Site is required."))
         visits = super().create(vals_list)
         return visits
 
