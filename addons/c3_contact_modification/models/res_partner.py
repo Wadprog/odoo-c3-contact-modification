@@ -93,11 +93,21 @@ class ResPartner(models.Model):
 
     def _is_c3_individual_contact_without_gender(self):
         self.ensure_one()
-        return not self.is_company and self.type == "contact" and not self.gender
+        return (
+            not self.is_company
+            and self.type == "contact"
+            and not self.parent_id
+            and not self.gender
+        )
 
     def _is_c3_individual_contact_without_date_of_birth(self):
         self.ensure_one()
-        return not self.is_company and self.type == "contact" and not self.date_of_birth
+        return (
+            not self.is_company
+            and self.type == "contact"
+            and not self.parent_id
+            and not self.date_of_birth
+        )
 
     def _validate_c3_id_document(self, encoded_document):
         self.ensure_one()

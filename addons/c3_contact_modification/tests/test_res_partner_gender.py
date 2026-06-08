@@ -83,3 +83,22 @@ class TestResPartnerGender(TransactionCase):
         )
 
         self.assertFalse(partner.gender)
+
+    def test_child_contact_does_not_require_gender(self):
+        parent = self.env["res.partner"].create(
+            {
+                "name": "C3 Test Parent Company",
+                "is_company": True,
+                "type": "contact",
+            }
+        )
+        partner = self.env["res.partner"].create(
+            {
+                "name": "C3 Test Child Contact",
+                "parent_id": parent.id,
+                "is_company": False,
+                "type": "contact",
+            }
+        )
+
+        self.assertFalse(partner.gender)
