@@ -29,9 +29,19 @@
                         <field name="visit_ids" nolabel="1">
                             <list>
                                 <field name="create_date"/>
+                                <field name="site_id"/>
                                 <field name="visit_reason_id"/>
                                 <field name="note"/>
                             </list>
+                            <form>
+                                <sheet>
+                                    <group>
+                                        <field name="site_id"/>
+                                        <field name="visit_reason_id"/>
+                                        <field name="note"/>
+                                    </group>
+                                </sheet>
+                            </form>
                         </field>
                     </group>
                 </page>
