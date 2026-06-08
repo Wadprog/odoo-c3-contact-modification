@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="view_c3_contact_visit_reason_tree" model="ir.ui.view">
+        <field name="name">c3.contact.visit.reason.tree</field>
+        <field name="model">c3.contact.visit.reason</field>
+        <field name="arch" type="xml">
+            <list>
+                <field name="name"/>
+            </list>
+        </field>
+    </record>
+
+    <record id="view_c3_contact_visit_reason_form" model="ir.ui.view">
+        <field name="name">c3.contact.visit.reason.form</field>
+        <field name="model">c3.contact.visit.reason</field>
+        <field name="arch" type="xml">
+            <form>
+                <sheet>
+                    <group>
+                        <field name="name"/>
+                    </group>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <record id="action_c3_contact_visit_reason" model="ir.actions.act_window">
+        <field name="name">Visit Reasons</field>
+        <field name="res_model">c3.contact.visit.reason</field>
+        <field name="view_mode">list,form</field>
+    </record>
+</odoo>

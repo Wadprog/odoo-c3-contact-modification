@@ -113,3 +113,33 @@ msgstr "%(user)s a remplacé la pièce d'identité."
 #, python-format
 msgid "%(user)s deleted the ID document."
 msgstr "%(user)s a supprimé la pièce d'identité."
+
+#. module: c3_contact_modification
+#: model_terms:ir.ui.view,arch_db:c3_contact_modification.view_partner_form_inherit_gender
+msgid "Visits"
+msgstr "Visites"
+
+#. module: c3_contact_modification
+#: model:ir.model.fields,field_description:c3_contact_modification.field_c3_contact_visit__visit_reason_id
+msgid "Visit Reason"
+msgstr "Motif de visite"
+
+#. module: c3_contact_modification
+#: model:ir.model.fields,field_description:c3_contact_modification.field_c3_contact_visit__site_id
+msgid "Site"
+msgstr "Site"
+
+#. module: c3_contact_modification
+#: model:ir.model.fields,field_description:c3_contact_modification.field_c3_contact_visit__note
+msgid "Note"
+msgstr "Note"
+
+#. module: c3_contact_modification
+#: code:addons/c3_contact_modification/models/res_partner_visit.py:0
+msgid "Visit reason is required."
+msgstr "Le motif de visite est obligatoire."
+
+#. module: c3_contact_modification
+#: code:addons/c3_contact_modification/models/res_partner_visit.py:0
+msgid "Site is required."
+msgstr "Le site est obligatoire."

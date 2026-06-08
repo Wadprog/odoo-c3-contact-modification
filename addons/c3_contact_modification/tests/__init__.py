@@ -11,3 +11,7 @@ from . import test_contact_id_document_edge_cases
 from . import test_contact_id_document_validation
 from . import test_contact_id_document_view
 from . import test_contact_id_document_audit_log
+from . import test_res_partner_visit_reason
+from . import test_res_partner_visit
+from . import test_res_partner_visit_view
+from . import test_res_partner_visit_translation

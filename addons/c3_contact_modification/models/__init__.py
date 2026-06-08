@@ -2,3 +2,5 @@
 
 from . import res_partner
 from . import res_partner_category
+from . import res_partner_visit_reason
+from . import res_partner_visit

@@ -36,6 +36,12 @@ class ResPartner(models.Model):
         string="ID Document Filename",
         copy=False,
     )
+    visit_ids = fields.One2many(
+        comodel_name="c3.contact.visit",
+        inverse_name="partner_id",
+        string="Visits",
+        copy=False,
+    )
 
     @api.model_create_multi
     def create(self, vals_list):
